@@ -100,7 +100,7 @@
                 </div>
 
                 <div class="col-span-3 text-center mt-8">
-                    <button type="submit" class="w-full py-3 px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-indigo-300">Simpan Data</button>
+                    <button type="submit" id="submit-btn" class="w-full py-3 px-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-semibold rounded-lg shadow-xl transform hover:scale-105 transition duration-300 ease-in-out focus:outline-none focus:ring-4 focus:ring-indigo-300">Simpan Data</button>
                 </div>
             </div>
         </form>
@@ -141,97 +141,104 @@
 
     </div>
 
-    <script>
-        // Toggle Dark Mode
-        document.getElementById("dark-mode-toggle").addEventListener("click", function () {
-            document.body.classList.toggle("dark");
-            const currentMode = document.body.classList.contains("dark") ? "Dark" : "Light";
-            localStorage.setItem("theme", currentMode);
+<script>
+    // Toggle Dark Mode
+    document.getElementById("dark-mode-toggle").addEventListener("click", function () {
+        document.body.classList.toggle("dark");
+        const currentMode = document.body.classList.contains("dark") ? "Dark" : "Light";
+        localStorage.setItem("theme", currentMode);
+    });
+
+    // Initialize localStorage data
+    let dataStorage = JSON.parse(localStorage.getItem('dataStorage')) || [];
+
+    // Load data from localStorage
+    function loadData() {
+        const dataTableBody = document.getElementById('data-history');
+        dataTableBody.innerHTML = ''; // Clear existing table rows
+        dataStorage.forEach((data, index) => {
+            const row = `
+                <tr>
+                    <td class="px-6 py-4">${index + 1}</td>
+                    <td class="px-6 py-4">${data.periode}</td>
+                    <td class="px-6 py-4">${data.namaPT}</td>
+                    <td class="px-6 py-4">${data.supplier}</td>
+                    <td class="px-6 py-4">${data.preOrder}</td>
+                    <td class="px-6 py-4">${data.invoice}</td>
+                    <td class="px-6 py-4">${data.tglInvoice}</td>
+                    <td class="px-6 py-4">${data.total}</td>
+                    <td class="px-6 py-4">${data.keterangan}</td>
+                    <td class="px-6 py-4">${data.faktur}</td>
+                    <td class="px-6 py-4">
+                        <button class="text-yellow-500 hover:text-yellow-700 focus:outline-none" onclick="editData(${index})"><i class="fa fa-edit"></i> Edit</button>
+                        <button class="text-red-500 hover:text-red-700 focus:outline-none" onclick="deleteData(${index})"><i class="fa fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+            `;
+            dataTableBody.insertAdjacentHTML('beforeend', row); // Add new row to the table
         });
+    }
 
-        // Initialize localStorage data
-        let dataStorage = JSON.parse(localStorage.getItem('dataStorage')) || [];
+    // Add data to localStorage and table
+    document.getElementById("data-form").addEventListener("submit", function (e) {
+        e.preventDefault(); // Prevent form from reloading the page
 
-        // Load data from localStorage
-        function loadData() {
-            const dataTableBody = document.getElementById('data-history');
-            dataTableBody.innerHTML = '';
-            dataStorage.forEach((data, index) => {
-                const row = `
-                    <tr>
-                        <td class="px-6 py-4">${index + 1}</td>
-                        <td class="px-6 py-4">${data.periode}</td>
-                        <td class="px-6 py-4">${data.namaPT}</td>
-                        <td class="px-6 py-4">${data.supplier}</td>
-                        <td class="px-6 py-4">${data.preOrder}</td>
-                        <td class="px-6 py-4">${data.invoice}</td>
-                        <td class="px-6 py-4">${data.tglInvoice}</td>
-                        <td class="px-6 py-4">${data.total}</td>
-                        <td class="px-6 py-4">${data.keterangan}</td>
-                        <td class="px-6 py-4">${data.faktur}</td>
-                        <td class="px-6 py-4">
-                            <button class="text-yellow-500 hover:text-yellow-700 focus:outline-none" onclick="editData(${index})"><i class="fa fa-edit"></i> Edit</button>
-                            <button class="text-red-500 hover:text-red-700 focus:outline-none" onclick="deleteData(${index})"><i class="fa fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                `;
-                dataTableBody.insertAdjacentHTML('beforeend', row);
-            });
-        }
+        const formData = new FormData(this);
+        const data = {
+            periode: formData.get('periode'),
+            namaPT: formData.get('namaPT'),
+            supplier: formData.get('supplier'),
+            preOrder: formData.get('preOrder'),
+            invoice: formData.get('invoice'),
+            tglInvoice: formData.get('tglInvoice'),
+            total: formData.get('total'),
+            keterangan: formData.get('keterangan'),
+            faktur: formData.get('faktur')
+        };
 
-        // Add data
-        document.getElementById("data-form").addEventListener("submit", function (e) {
-            e.preventDefault();
+        // Add new data to dataStorage array
+        dataStorage.push(data);
 
-            const formData = new FormData(this);
-            const data = {
-                periode: formData.get('periode'),
-                namaPT: formData.get('namaPT'),
-                supplier: formData.get('supplier'),
-                preOrder: formData.get('preOrder'),
-                invoice: formData.get('invoice'),
-                tglInvoice: formData.get('tglInvoice'),
-                total: formData.get('total'),
-                keterangan: formData.get('keterangan'),
-                faktur: formData.get('faktur')
-            };
+        // Save updated dataStorage to localStorage
+        localStorage.setItem('dataStorage', JSON.stringify(dataStorage));
 
-            dataStorage.push(data);
-            localStorage.setItem('dataStorage', JSON.stringify(dataStorage));
-
-            loadData();
-            this.reset();
-            vanillaToast.success('Data berhasil disimpan!');
-        });
-
-        // Edit data
-        function editData(index) {
-            const data = dataStorage[index];
-            document.querySelector('[name="periode"]').value = data.periode;
-            document.querySelector('[name="namaPT"]').value = data.namaPT;
-            document.querySelector('[name="supplier"]').value = data.supplier;
-            document.querySelector('[name="preOrder"]').value = data.preOrder;
-            document.querySelector('[name="invoice"]').value = data.invoice;
-            document.querySelector('[name="tglInvoice"]').value = data.tglInvoice;
-            document.querySelector('[name="total"]').value = data.total;
-            document.querySelector('[name="keterangan"]').value = data.keterangan;
-            document.querySelector('[name="faktur"]').value = data.faktur;
-
-            // Remove the item from localStorage to allow update
-            deleteData(index);
-        }
-
-        // Delete data
-        function deleteData(index) {
-            dataStorage.splice(index, 1);
-            localStorage.setItem('dataStorage', JSON.stringify(dataStorage));
-            loadData();
-            vanillaToast.success('Data berhasil dihapus!');
-        }
-
-        // Load data on page load
+        // Reload data into the table
         loadData();
-        
+
+        // Reset the form and display success message
+        this.reset();
+        vanillaToast.success('Data berhasil disimpan!');
+    });
+
+    // Edit data
+    function editData(index) {
+        const data = dataStorage[index];
+        document.querySelector('[name="periode"]').value = data.periode;
+        document.querySelector('[name="namaPT"]').value = data.namaPT;
+        document.querySelector('[name="supplier"]').value = data.supplier;
+        document.querySelector('[name="preOrder"]').value = data.preOrder;
+        document.querySelector('[name="invoice"]').value = data.invoice;
+        document.querySelector('[name="tglInvoice"]').value = data.tglInvoice;
+        document.querySelector('[name="total"]').value = data.total;
+        document.querySelector('[name="keterangan"]').value = data.keterangan;
+        document.querySelector('[name="faktur"]').value = data.faktur;
+
+        // Remove the item from localStorage to allow update
+        deleteData(index);
+    }
+
+    // Delete data
+    function deleteData(index) {
+        dataStorage.splice(index, 1); // Remove data from array
+        localStorage.setItem('dataStorage', JSON.stringify(dataStorage)); // Update localStorage
+        loadData(); // Reload the table after deletion
+        vanillaToast.success('Data berhasil dihapus!');
+    }
+
+    // Load data on page load
+    loadData();
+    
+    // Input field handling (focus/blur)
     document.addEventListener("DOMContentLoaded", function() {
         const inputs = document.querySelectorAll("input[type='month'], input[type='date']");
         inputs.forEach(input => {
@@ -248,7 +255,9 @@
         });
     });
 
-    </script>
+</script>
+
+
 
 </body>
 </html>
