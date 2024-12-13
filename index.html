@@ -1,239 +1,132 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tanda Terima Pre-order 2023-2024 HO-KBN</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vanilla-toast@1.1.1/vanilla-toast.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Tanda Terima Preorder</title>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoOpKPh1mBAG5ConIohxqT4SMtFwW6Nq8",
+    authDomain: "tanda-terima-preorder-8c4d3.firebaseapp.com",
+    projectId: "tanda-terima-preorder-8c4d3",
+    storageBucket: "tanda-terima-preorder-8c4d3.firebasestorage.app",
+    messagingSenderId: "118639827128",
+    appId: "1:118639827128:web:0567bd329c9fd38cf9fc4d"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        /* Custom Styles */
-        .group.relative {
-            position: relative;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
         }
-        .label {
-            position: absolute;
-            top: 50%;
-            left: 4%;
-            transform: translateY(-50%);
-            transition: all 0.3s ease;
-            color: #888;
+        .header {
+            background-color: #ff6f61;
+            color: white;
+            padding: 20px;
+            text-align: center;
         }
-        .input:focus ~ .label,
-        .input:valid ~ .label {
-            top: 0;
-            font-size: 0.75rem;
-            color: #4f46e5;
+        .container {
+            padding: 30px;
         }
-
-        .input {
-            text-shadow: none;
+        .card {
+            margin-top: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        ::placeholder {
-            color: #888;
-            opacity: 1;
-        }
-
-        .input:focus::placeholder {
-            opacity: 0;
+        footer {
+            background-color: #ff6f61;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-600 via-pink-600 to-purple-600 min-h-screen font-sans transition-all duration-300 ease-in-out dark:bg-gray-900 dark:text-white flex justify-center items-center">
+<body>
 
-    <div class="container mx-auto p-8 bg-white rounded-xl shadow-2xl max-w-7xl dark:bg-gray-800 dark:border dark:border-gray-700 transition-all duration-300 ease-in-out">
+    <!-- Header Section -->
+    <div class="header">
+        <h1>Tanda Terima Preorder</h1>
+        <p>Mudahnya mengelola pesanan Anda</p>
+    </div>
 
-        <!-- Header -->
-        <header class="text-center mb-12 animate__animated animate__fadeIn">
-            <h1 class="text-5xl font-extrabold text-gray-900 tracking-wide mb-4 dark:text-white">Tanda Terima Pre-order 2023-2024 HO-KBN</h1>
-            <p class="text-lg text-gray-600 dark:text-gray-300">Formulir Pengisian dan Riwayat Data Pre-order untuk Keperluan Administrasi</p>
-        </header>
-
-        <!-- Search and Export Section -->
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex space-x-4">
-                <input type="text" id="search-pt" placeholder="Cari berdasarkan Nama PT" class="w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
-                <input type="date" id="search-date" class="w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
-            </div>
-
-            <div>
-                <button id="export-pdf-btn" aria-label="Export to PDF" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700 mr-2">PDF</button>
-                <button id="export-word-btn" aria-label="Export to Word" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700 mr-2">Word</button>
-                <button id="export-txt-btn" aria-label="Export to TXT" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-700 mr-2">TXT</button>
-                <button id="export-csv-btn" aria-label="Export to CSV" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700 mr-2">CSV</button>
-                <button id="export-excel-btn" aria-label="Export to Excel" class="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-700">Excel</button>
-            </div>
-        </div>
-
-        <!-- Form Pengisian Data -->
-        <form id="data-form" class="space-y-6 bg-gray-100 p-8 rounded-xl shadow-md dark:bg-gray-700 animate__animated animate__fadeIn">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Form Fields -->
-                <div class="group relative">
-                    <label for="nomor" class="label" aria-label="Nomor"></label>
-                    <input type="text" id="nomor" disabled placeholder="Nomor" class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-                <div class="group relative">
-                    <label for="periode" class="label" aria-label="Periode"></label>
-                    <input type="month" id="periode" name="periode" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
-                </div>
-                <div class="group relative">
-                    <label for="namaPT" class="label" aria-label="Nama PT"></label>
-                    <input type="text" name="namaPT" placeholder="Nama PT" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-                <div class="group relative">
-                    <label for="supplier" class="label" aria-label="Supplier"></label>
-                    <input type="text" name="supplier" placeholder="Supplier" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-                <div class="group relative">
-                    <label for="preOrder" class="label" aria-label="Nomor Pre-order"></label>
-                    <input type="text" name="preOrder" placeholder="Nomor Pre-order" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-                <div class="group relative">
-                    <label for="invoice" class="label" aria-label="Nomor Invoice"></label>
-                    <input type="text" name="invoice" placeholder="Nomor Invoice" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-                <div class="group relative">
-                    <label for="tglInvoice" class="label" aria-label="Tanggal Invoice"></label>
-                    <input type="date" name="tglInvoice" placeholder="Pilih Tanggal" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white" />
-                </div>
-                <div class="group relative">
-                    <label for="total" class="label" aria-label="Total"></label>
-                    <input type="number" name="total" placeholder="Total" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-                <div class="group relative">
-                    <label for="keterangan" class="label" aria-label="Keterangan"></label>
-                    <input type="text" name="keterangan" placeholder="Keterangan" required class="input w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-900 dark:border-gray-600 dark:text-white"/>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="flex justify-end">
-                <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Tambah Data</button>
-            </div>
-        </form>
-
-        <!-- Data Table -->
-        <div class="mt-8 overflow-x-auto">
-            <table id="data-table" class="min-w-full table-auto border-collapse bg-white dark:bg-gray-700 shadow-lg">
-                <thead class="bg-indigo-600 text-white">
-                    <tr>
-                        <th class="py-3 px-4 text-left">Nomor</th>
-                        <th class="py-3 px-4 text-left">Periode</th>
-                        <th class="py-3 px-4 text-left">Nama PT</th>
-                        <th class="py-3 px-4 text-left">Supplier</th>
-                        <th class="py-3 px-4 text-left">Pre-Order</th>
-                        <th class="py-3 px-4 text-left">Invoice</th>
-                        <th class="py-3 px-4 text-left">Tanggal</th>
-                        <th class="py-3 px-4 text-left">Total</th>
-                        <th class="py-3 px-4 text-left">Keterangan</th>
-                        <th class="py-3 px-4 text-left">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body" class="text-gray-700 dark:text-white">
-                    <!-- Data rows will be dynamically inserted here -->
-                </tbody>
-            </table>
+    <!-- Main Content -->
+    <div class="container">
+        <h2>Daftar Pesanan</h2>
+        <div class="row" id="order-list">
+            <!-- Data akan ditampilkan di sini -->
         </div>
     </div>
 
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 Tanda Terima Preorder. All Rights Reserved.</p>
+    </footer>
+
     <script>
-        let rowCount = 0;
-        const form = document.getElementById('data-form');
-        const tableBody = document.getElementById('table-body');
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoOpKPh1mBAG5ConIohxqT4SMtFwW6Nq8",
+            authDomain: "tanda-terima-preorder-8c4d3.firebaseapp.com",
+            databaseURL: "https://tanda-terima-preorder-8c4d3.firebaseio.com",
+            projectId: "tanda-terima-preorder-8c4d3",
+            storageBucket: "tanda-terima-preorder-8c4d3.firebasestorage.app",
+            messagingSenderId: "118639827128",
+            appId: "1:118639827128:web:0567bd329c9fd38cf9fc4d",
+            measurementId: "G-XV8ZERFB1N"
+        };
 
-        // Fungsi untuk mengirim data ke Google Sheets melalui Google Apps Script
-        function addToGoogleSheet(data) {
-            const url = 'https://script.google.com/d/1x5mCXDDFYZngOqZw5Rf5cSic8SnI_xZ08xA4BotRZoJS_t-0v2SH-j3l/edit?usp=sharing';
-            
-            const body = JSON.stringify(data);
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: body
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data === "Data berhasil ditambahkan") {
-                    // Update local table if success
-                    const row = tableBody.insertRow();
-                    Object.values(data).forEach(value => {
-                        const cell = row.insertCell();
-                        cell.textContent = value;
-                    });
-                } else {
-                    vanillaToast.error('Gagal menambahkan data.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        // Function to Fetch and Display Orders
+        function displayOrders() {
+            db.collection("orders").get().then((querySnapshot) => {
+                const orderList = document.getElementById("order-list");
+                orderList.innerHTML = ''; // Clear existing content
+
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const card = `
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${order.name}</h5>
+                                    <p class="card-text">Invoice: ${order.invoice}</p>
+                                    <p class="card-text">Total: ${order.total}</p>
+                                    <p class="card-text">Tanggal: ${order.date}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    orderList.innerHTML += card;
+                });
+            }).catch((error) => {
+                console.error("Error getting documents: ", error);
+            });
         }
 
-        // Fungsi untuk mengambil data dari Google Sheets
-        function getGoogleSheetData() {
-            const url = 'https://script.google.com/d/1x5mCXDDFYZngOqZw5Rf5cSic8SnI_xZ08xA4BotRZoJS_t-0v2SH-j3l/edit?usp=sharing';
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    // Menampilkan data ke tabel
-                    data.forEach(item => {
-                        const row = tableBody.insertRow();
-                        Object.values(item).forEach(value => {
-                            const cell = row.insertCell();
-                            cell.textContent = value;
-                        });
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        // Form submit event handler
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(form);
-            const data = {
-                nomor: `TR-${++rowCount}`,
-                periode: formData.get('periode'),
-                namaPT: formData.get('namaPT'),
-                supplier: formData.get('supplier'),
-                preOrder: formData.get('preOrder'),
-                invoice: formData.get('invoice'),
-                tglInvoice: formData.get('tglInvoice'),
-                total: formData.get('total'),
-                keterangan: formData.get('keterangan')
-            };
-
-            // Kirim data ke Google Sheets
-            addToGoogleSheet(data);
-            
-            // Reset form
-            form.reset();
-            vanillaToast.success('Data berhasil ditambahkan!');
-        });
-
-        // Get data from Google Sheets on load
-        window.onload = getGoogleSheetData;
+        // Call displayOrders function when the page loads
+        window.onload = function() {
+            displayOrders();
+        };
     </script>
 </body>
 </html>
